@@ -345,3 +345,271 @@
   transition: width 0.3s ease;
   opacity: 0.8;
 }
+
+/* ===== View Toggle ===== */
+.view-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.view-toggle-label {
+  font-size: 0.78rem;
+  color: #7070a0;
+  white-space: nowrap;
+}
+
+/* ===== Three.js Wrapper ===== */
+.three-wrapper {
+  width: 100%;
+  height: 500px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid #2a2a4a;
+}
+
+/* ===== BiomeEditor ===== */
+.biome-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Card per biome */
+.biome-card {
+  background: #0f0f20;
+  border: 1px solid #2a2a4a;
+  border-radius: 6px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Field label above input */
+.biome-field-label {
+  display: block;
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #5555a0;
+  margin-bottom: 2px;
+}
+
+/* Group: label + input stacked */
+.biome-field-group {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Name field takes remaining space */
+.biome-field-name {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Header row: color | name | delete */
+.biome-card-header {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+/* Height row: min | max side by side */
+.biome-card-heights {
+  display: flex;
+  gap: 6px;
+}
+
+.biome-card-heights .biome-field-group {
+  flex: 1;
+}
+
+.biome-color-input {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 1px solid #3a3a6a;
+  background: transparent;
+  flex-shrink: 0;
+}
+
+.biome-name-input {
+  width: 100%;
+  min-width: 0;
+  background: #0c0c1a;
+  border: 1px solid #3a3a6a;
+  border-radius: 4px;
+  color: #c8d8ff;
+  font-family: 'Courier New', monospace;
+  font-size: 0.78rem;
+  padding: 3px 6px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.biome-name-input:focus {
+  border-color: #5577ff;
+}
+
+.biome-height-input {
+  width: 100%;
+  text-align: center;
+  background: #0c0c1a;
+  border: 1px solid #3a3a6a;
+  border-radius: 4px;
+  color: #c8d8ff;
+  font-family: 'Courier New', monospace;
+  font-size: 0.78rem;
+  padding: 3px 4px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.biome-height-input:focus {
+  border-color: #5577ff;
+}
+
+/* Remove number input spinners */
+.biome-height-input::-webkit-outer-spin-button,
+.biome-height-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.biome-height-input[type=number] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.biome-delete-btn {
+  background: transparent;
+  border: 1px solid #3a2a2a;
+  border-radius: 4px;
+  color: #aa5555;
+  font-size: 0.72rem;
+  padding: 4px 6px;
+  cursor: pointer;
+  flex-shrink: 0;
+  align-self: flex-end;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.biome-delete-btn:hover:not(:disabled) {
+  background: #3a0a0a;
+  color: #ff7777;
+  border-color: #aa3333;
+}
+
+.biome-delete-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.biome-add-btn {
+  background: #1a1a3e;
+  border: 1px solid #3a3a6a;
+  border-radius: 4px;
+  color: #7799cc;
+  font-size: 0.75rem;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  align-self: stretch;
+  text-align: center;
+}
+
+.biome-add-btn:hover {
+  background: #2233aa;
+  color: #c8d8ff;
+}
+
+.biome-warning {
+  color: #ccaa22;
+  font-size: 0.68rem;
+}
+
+.biome-objects-toggle {
+  background: transparent;
+  border: none;
+  color: #555580;
+  font-size: 0.68rem;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  transition: color 0.15s;
+}
+
+.biome-objects-toggle:hover {
+  color: #8888bb;
+}
+
+.biome-objects-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 2px;
+  border-top: 1px solid #2a2a4a;
+}
+
+.biome-obj-row {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 6px;
+  background: #0a0a18;
+  border: 1px solid #22223a;
+  border-radius: 5px;
+}
+
+/* Name + delete on same row */
+.biome-obj-header {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+/* Slider + number side by side */
+.biome-prob-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.biome-prob-slider {
+  flex: 1;
+  accent-color: #5577ff;
+  cursor: pointer;
+  height: 4px;
+}
+
+.biome-prob-number {
+  width: 42px !important;
+  flex-shrink: 0;
+}
+
+/* Weight fill bar under the slider */
+.biome-weight-bar-wrap {
+  height: 4px;
+  background: #1a1a3e;
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 3px;
+}
+
+.biome-weight-bar {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.15s ease;
+  opacity: 0.85;
+}
+
+/* Probs section spacing */
+.biome-probs {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding-top: 2px;
+  border-top: 1px solid #22223a;
+}

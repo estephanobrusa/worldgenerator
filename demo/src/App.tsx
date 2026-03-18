@@ -2,16 +2,30 @@ import { useState, useEffect, useRef } from 'react'
 import { generate2DMap, generate3DMap } from 'procedural-map-gen'
 import { renderMap } from 'procedural-map-gen/canvas'
 import type { Map2D, Map3D, MapConfig } from 'procedural-map-gen'
+import ThreeView from './ThreeView'
+import BiomeEditor from './BiomeEditor'
+import type { BiomeEntry } from './types'
 import './App.css'
 
-const DEFAULT_BIOMES = [
-  { name: 'ocean',    objects: [], heightRange: [0.0, 0.2] as [number, number] },
-  { name: 'water',    objects: [], heightRange: [0.2, 0.35] as [number, number] },
-  { name: 'plain',    objects: [{ name: 'grass', probability: 10 }], heightRange: [0.35, 0.55] as [number, number] },
-  { name: 'forest',   objects: [{ name: 'tree', probability: 30 }], heightRange: [0.55, 0.7] as [number, number] },
-  { name: 'mountain', objects: [{ name: 'rock', probability: 20 }], heightRange: [0.7, 0.85] as [number, number] },
-  { name: 'desert',   objects: [{ name: 'cactus', probability: 15 }], heightRange: [0.85, 1.0] as [number, number] },
+const INITIAL_BIOMES: BiomeEntry[] = [
+  { name: 'ocean',    heightMin: 0.0,  heightMax: 0.2,  color: '#0d4f7a', weight: 17, objects: [] },
+  { name: 'water',    heightMin: 0.2,  heightMax: 0.35, color: '#1a6b9a', weight: 17, objects: [] },
+  { name: 'plain',    heightMin: 0.35, heightMax: 0.55, color: '#7ec850', weight: 17, objects: [{ name: 'grass', probability: 10 }] },
+  { name: 'forest',   heightMin: 0.55, heightMax: 0.7,  color: '#2d7a2d', weight: 16, objects: [{ name: 'tree',  probability: 30 }] },
+  { name: 'mountain', heightMin: 0.7,  heightMax: 0.85, color: '#8b8b8b', weight: 17, objects: [{ name: 'rock',  probability: 20 }] },
+  { name: 'desert',   heightMin: 0.85, heightMax: 1.0,  color: '#e8c87a', weight: 16, objects: [{ name: 'cactus', probability: 15 }] },
 ]
+
+const INITIAL_COLORS: Record<string, string> = {
+  ocean:    '#0d4f7a',
+  water:    '#1a6b9a',
+  plain:    '#7ec850',
+  land:     '#a8d878',
+  forest:   '#2d7a2d',
+  mountain: '#8b8b8b',
+  desert:   '#e8c87a',
+  sky:      '#87ceeb',
+}
 
 function countBiomes(map: Map2D): Record<string, number> {
   const counts: Record<string, number> = {}
@@ -21,17 +35,6 @@ function countBiomes(map: Map2D): Record<string, number> {
     }
   }
   return counts
-}
-
-const BIOME_COLORS: Record<string, string> = {
-  ocean:    '#0d4f7a',
-  water:    '#1a6b9a',
-  plain:    '#7ec850',
-  land:     '#a8d878',
-  forest:   '#2d7a2d',
-  mountain: '#8b8b8b',
-  desert:   '#e8c87a',
-  sky:      '#87ceeb',
 }
 
 export default function App() {
@@ -49,6 +52,10 @@ export default function App() {
   const [currentMap2D, setCurrentMap2D] = useState<Map2D | null>(null)
   const [currentMap3D, setCurrentMap3D] = useState<Map3D | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [viewMode, setViewMode] = useState<'canvas' | 'three'>('canvas')
+
+  const [biomes, setBiomes] = useState<BiomeEntry[]>(INITIAL_BIOMES)
+  const [biomeColors, setBiomeColors] = useState<Record<string, string>>(INITIAL_COLORS)
 
   // Derive biome counts and total cells from current map state
   const activeLayer: Map2D | null =
@@ -62,11 +69,30 @@ export default function App() {
   function generateMap() {
     setError(null)
     try {
+      // Derive heightRange from weights: partition [0..1] proportionally
+      const totalWeight = biomes.reduce((s, b) => s + b.weight, 0) || 1
+      let cursor = 0
+      const biomesWithRanges = biomes.map(b => {
+        const share = b.weight / totalWeight
+        const min = cursor
+        const max = cursor + share
+        cursor = max
+        return {
+          name: b.name,
+          objects: b.objects,
+          heightRange: [min, max] as [number, number],
+        }
+      })
+      // Clamp last biome to exactly 1.0 to avoid floating-point drift
+      if (biomesWithRanges.length > 0) {
+        biomesWithRanges[biomesWithRanges.length - 1].heightRange[1] = 1.0
+      }
+
       const config: MapConfig = {
         width,
         height,
         seed,
-        biomes: DEFAULT_BIOMES,
+        biomes: biomesWithRanges,
       }
       if (mode === '2D') {
         const map = generate2DMap(config)
@@ -90,17 +116,22 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Auto-regenerate when biomes change (height ranges, probabilities, names)
+  useEffect(() => {
+    generateMap()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [biomes])
   // Render canvas whenever map or display settings change
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas || !activeLayer) return
 
     try {
-      renderMap(canvas, activeLayer, { cellSize, showObjects, colorMap: BIOME_COLORS })
+      renderMap(canvas, activeLayer, { cellSize, showObjects, colorMap: biomeColors })
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e))
     }
-  }, [activeLayer, cellSize, showObjects])
+  }, [activeLayer, cellSize, showObjects, viewMode, biomeColors])
 
   const maxLayer = mode === '3D' && currentMap3D ? currentMap3D.length - 1 : 0
 
@@ -175,6 +206,15 @@ export default function App() {
             </label>
           </section>
 
+          <section className="control-group">
+            <h2>Biomes</h2>
+            <BiomeEditor
+              biomes={biomes}
+              colors={biomeColors}
+              onChange={(b, c) => { setBiomes(b); setBiomeColors(c) }}
+            />
+          </section>
+
           <button className="regen-btn" onClick={generateMap}>
             Regenerate
           </button>
@@ -208,10 +248,39 @@ export default function App() {
             </div>
           )}
 
-          {/* Canvas */}
-          <div className="canvas-wrapper">
-            <canvas ref={canvasRef} />
+          {/* View toggle */}
+          <div className="view-toggle">
+            <span className="view-toggle-label">View</span>
+            <div className="toggle-group">
+              <button
+                className={`toggle-btn ${viewMode === 'canvas' ? 'active' : ''}`}
+                onClick={() => setViewMode('canvas')}
+              >Canvas 2D</button>
+              <button
+                className={`toggle-btn ${viewMode === 'three' ? 'active' : ''}`}
+                onClick={() => setViewMode('three')}
+              >Three.js 3D</button>
+            </div>
           </div>
+
+          {/* Canvas */}
+          {viewMode === 'canvas' && (
+            <div className="canvas-wrapper">
+              <canvas ref={canvasRef} />
+            </div>
+          )}
+
+          {/* Three.js 3D view */}
+          {viewMode === 'three' && (
+            <div className="three-wrapper">
+              <ThreeView
+                map2D={currentMap2D}
+                map3D={currentMap3D}
+                mode={mode}
+                biomeColors={biomeColors}
+              />
+            </div>
+          )}
 
           {/* Stats */}
           <div className="stats-panel">
@@ -235,7 +304,7 @@ export default function App() {
                 .sort((a, b) => b[1] - a[1])
                 .map(([biome, count]) => {
                   const pct = totalCells > 0 ? ((count / totalCells) * 100).toFixed(1) : '0'
-                  const color = BIOME_COLORS[biome] ?? '#cccccc'
+                  const color = biomeColors[biome] ?? '#cccccc'
                   return (
                     <div key={biome} className="biome-row">
                       <span className="biome-name">
