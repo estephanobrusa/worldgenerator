@@ -1,0 +1,347 @@
+/* ===== Reset & Base ===== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ===== App Layout ===== */
+.app {
+  min-height: 100vh;
+  background: #0f0f1a;
+  color: #e0e0f0;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+.app-header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 14px 24px;
+  background: #1a1a2e;
+  border-bottom: 1px solid #2a2a4a;
+}
+
+.app-header h1 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #a0c8ff;
+  letter-spacing: 0.03em;
+}
+
+.header-sub {
+  font-size: 0.75rem;
+  color: #6060a0;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.app-body {
+  display: flex;
+  flex: 1;
+  gap: 0;
+  overflow: auto;
+}
+
+/* ===== Sidebar ===== */
+.sidebar {
+  width: 220px;
+  min-width: 220px;
+  background: #12122a;
+  border-right: 1px solid #2a2a4a;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.control-group h2 {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #5555a0;
+  margin-bottom: 4px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #2a2a4a;
+}
+
+.control-label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.78rem;
+  color: #a0a0c0;
+}
+
+.control-label input[type="range"] {
+  width: 100%;
+  accent-color: #5577ff;
+  cursor: pointer;
+}
+
+.control-label.checkbox-label {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.val {
+  color: #7799ff;
+  font-size: 0.72rem;
+  margin-left: 4px;
+}
+
+.seed-input {
+  background: #0f0f1a;
+  border: 1px solid #3a3a6a;
+  border-radius: 4px;
+  color: #c8d8ff;
+  font-family: 'Courier New', monospace;
+  font-size: 0.82rem;
+  padding: 4px 8px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.seed-input:focus {
+  border-color: #5577ff;
+}
+
+/* ===== Toggle ===== */
+.toggle-group {
+  display: flex;
+  gap: 0;
+  border-radius: 5px;
+  overflow: hidden;
+  border: 1px solid #3a3a6a;
+  margin-top: 2px;
+}
+
+.toggle-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #7070a0;
+  font-size: 0.8rem;
+  padding: 5px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.toggle-btn.active {
+  background: #2233aa;
+  color: #c8d8ff;
+}
+
+.toggle-btn:not(.active):hover {
+  background: #1a1a3e;
+  color: #a0a0d0;
+}
+
+/* ===== Regen Button ===== */
+.regen-btn {
+  background: #2233aa;
+  color: #c8d8ff;
+  border: 1px solid #4455cc;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 9px 12px;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: background 0.15s, transform 0.1s;
+  margin-top: auto;
+}
+
+.regen-btn:hover {
+  background: #3344bb;
+}
+
+.regen-btn:active {
+  transform: scale(0.97);
+}
+
+/* ===== Main Content ===== */
+.main-content {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow: auto;
+}
+
+/* ===== Error ===== */
+.error-banner {
+  background: #3a0a0a;
+  border: 1px solid #aa2222;
+  border-radius: 6px;
+  color: #ff8888;
+  font-size: 0.82rem;
+  padding: 8px 14px;
+}
+
+/* ===== Layer Selector ===== */
+.layer-selector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #1a1a2e;
+  border: 1px solid #2a2a4a;
+  border-radius: 6px;
+  padding: 8px 14px;
+}
+
+.layer-btn {
+  background: #2233aa;
+  border: 1px solid #4455cc;
+  border-radius: 4px;
+  color: #c8d8ff;
+  font-size: 0.9rem;
+  padding: 3px 10px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.layer-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.layer-btn:not(:disabled):hover {
+  background: #3344bb;
+}
+
+.layer-label {
+  font-size: 0.8rem;
+  color: #7799ff;
+  min-width: 90px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.layer-slider {
+  flex: 1;
+  accent-color: #5577ff;
+  cursor: pointer;
+}
+
+/* ===== Canvas ===== */
+.canvas-wrapper {
+  display: flex;
+  align-items: flex-start;
+}
+
+.canvas-wrapper canvas {
+  display: block;
+  border: 2px solid #2a2a4a;
+  border-radius: 4px;
+  image-rendering: pixelated;
+}
+
+/* ===== Stats Panel ===== */
+.stats-panel {
+  background: #12122a;
+  border: 1px solid #2a2a4a;
+  border-radius: 8px;
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.stats-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 0.8rem;
+  color: #8888b0;
+}
+
+.stat-key {
+  text-transform: uppercase;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  color: #5555a0;
+  margin-right: 4px;
+}
+
+.stats-meta code {
+  font-family: 'Courier New', monospace;
+  color: #99ccff;
+  font-size: 0.82rem;
+}
+
+/* ===== Biome Table ===== */
+.biome-table {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.78rem;
+}
+
+.biome-header {
+  display: grid;
+  grid-template-columns: 110px 55px 50px 1fr;
+  color: #5555a0;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #2a2a4a;
+}
+
+.biome-row {
+  display: grid;
+  grid-template-columns: 110px 55px 50px 1fr;
+  align-items: center;
+  padding: 2px 0;
+  color: #a0a0c0;
+}
+
+.biome-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.biome-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.biome-count {
+  font-variant-numeric: tabular-nums;
+  color: #7788aa;
+}
+
+.biome-pct {
+  font-variant-numeric: tabular-nums;
+  color: #7799ff;
+}
+
+.biome-bar-wrap {
+  height: 10px;
+  background: #1a1a3e;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.biome-bar {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+  opacity: 0.8;
+}

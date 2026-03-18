@@ -1,0 +1,46 @@
+{
+  "name": "procedural-map-gen",
+  "version": "1.0.0",
+  "description": "Deterministic procedural 2D/3D map generation library",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "license": "MIT",
+  "keywords": ["procedural", "map", "generation", "noise", "biome", "world", "generator"],
+  "engines": {
+    "node": ">=16"
+  },
+  "files": ["dist", "README.md", "CHANGELOG.md", "LICENSE"],
+  "bin": {
+    "pmg": "./dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./canvas": {
+      "types": "./dist/canvas/index.d.ts",
+      "import": "./dist/canvas/index.js",
+      "require": "./dist/canvas/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "coverage": "vitest run --coverage",
+    "prepublishOnly": "npm run build && npm test"
+  },
+  "dependencies": {
+    "simplex-noise": "^4.0.1"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "vitest": "^1.6.0",
+    "@vitest/coverage-v8": "^1.6.0",
+    "typescript": "^5.4.0"
+  }
+}
