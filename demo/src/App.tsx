@@ -8,12 +8,12 @@ import type { BiomeEntry } from './types'
 import './App.css'
 
 const INITIAL_BIOMES: BiomeEntry[] = [
-  { name: 'ocean',    heightMin: 0.0,  heightMax: 0.2,  color: '#0d4f7a', weight: 17, objects: [] },
-  { name: 'water',    heightMin: 0.2,  heightMax: 0.35, color: '#1a6b9a', weight: 17, objects: [] },
-  { name: 'plain',    heightMin: 0.35, heightMax: 0.55, color: '#7ec850', weight: 17, objects: [{ name: 'grass', probability: 10 }] },
-  { name: 'forest',   heightMin: 0.55, heightMax: 0.7,  color: '#2d7a2d', weight: 16, objects: [{ name: 'tree',  probability: 30 }] },
-  { name: 'mountain', heightMin: 0.7,  heightMax: 0.85, color: '#8b8b8b', weight: 17, objects: [{ name: 'rock',  probability: 20 }] },
-  { name: 'desert',   heightMin: 0.85, heightMax: 1.0,  color: '#e8c87a', weight: 16, objects: [{ name: 'cactus', probability: 15 }] },
+  { name: 'ocean',    heightMin: 0.00, heightMax: 0.17, color: '#0d4f7a', objects: [] },
+  { name: 'water',    heightMin: 0.17, heightMax: 0.34, color: '#1a6b9a', objects: [] },
+  { name: 'plain',    heightMin: 0.34, heightMax: 0.51, color: '#7ec850', objects: [{ name: 'grass', probability: 10 }] },
+  { name: 'forest',   heightMin: 0.51, heightMax: 0.67, color: '#2d7a2d', objects: [{ name: 'tree',  probability: 30 }] },
+  { name: 'mountain', heightMin: 0.67, heightMax: 0.84, color: '#8b8b8b', objects: [{ name: 'rock',  probability: 20 }] },
+  { name: 'desert',   heightMin: 0.84, heightMax: 1.00, color: '#e8c87a', objects: [{ name: 'cactus', probability: 15 }] },
 ]
 
 const INITIAL_COLORS: Record<string, string> = {
@@ -43,6 +43,7 @@ export default function App() {
   const [width, setWidth] = useState(30)
   const [height, setHeight] = useState(20)
   const [seed, setSeed] = useState('world')
+  // TODO: move mode, depth, cellSize, showObjects into a "display settings" state object
   const [mode, setMode] = useState<'2D' | '3D'>('2D')
   const [depth, setDepth] = useState(4)
   const [cellSize, setCellSize] = useState(10)
@@ -69,24 +70,11 @@ export default function App() {
   function generateMap() {
     setError(null)
     try {
-      // Derive heightRange from weights: partition [0..1] proportionally
-      const totalWeight = biomes.reduce((s, b) => s + b.weight, 0) || 1
-      let cursor = 0
-      const biomesWithRanges = biomes.map(b => {
-        const share = b.weight / totalWeight
-        const min = cursor
-        const max = cursor + share
-        cursor = max
-        return {
-          name: b.name,
-          objects: b.objects,
-          heightRange: [min, max] as [number, number],
-        }
-      })
-      // Clamp last biome to exactly 1.0 to avoid floating-point drift
-      if (biomesWithRanges.length > 0) {
-        biomesWithRanges[biomesWithRanges.length - 1].heightRange[1] = 1.0
-      }
+      const biomesWithRanges = biomes.map(b => ({
+        name: b.name,
+        objects: b.objects,
+        heightRange: [b.heightMin, b.heightMax] as [number, number],
+      }))
 
       const config: MapConfig = {
         width,
@@ -133,7 +121,7 @@ export default function App() {
     }
   }, [activeLayer, cellSize, showObjects, viewMode, biomeColors])
 
-  const maxLayer = mode === '3D' && currentMap3D ? currentMap3D.length - 1 : 0
+  //const maxLayer = mode === '3D' && currentMap3D ? currentMap3D.length - 1 : 0
 
   return (
     <div className="app">
@@ -168,7 +156,7 @@ export default function App() {
             </label>
           </section>
 
-          <section className="control-group">
+          {/* <section className="control-group">
             <h2>Render</h2>
 
             <div className="control-label">
@@ -204,7 +192,7 @@ export default function App() {
                 onChange={e => setShowObjects(e.target.checked)} />
               Show Objects
             </label>
-          </section>
+          </section> */}
 
           <section className="control-group">
             <h2>Biomes</h2>
@@ -229,7 +217,7 @@ export default function App() {
           )}
 
           {/* Layer selector for 3D */}
-          {mode === '3D' && currentMap3D && (
+          {/* {mode === '3D' && currentMap3D && (
             <div className="layer-selector">
               <button
                 className="layer-btn"
@@ -246,7 +234,7 @@ export default function App() {
                 onChange={e => setSelectedLayer(Number(e.target.value))}
                 className="layer-slider" />
             </div>
-          )}
+          )} */}
 
           {/* View toggle */}
           <div className="view-toggle">

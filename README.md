@@ -1,6 +1,15 @@
 # procedural-map-gen
 
 A deterministic procedural 2D/3D map generation library with height-based biome assignment, noise-driven terrain, and optional canvas rendering.
+---
+
+ **Learning Project** — This library was built intentionally as a learning propose.
+
+## Preview
+
+| 2D Map | 3D Map |
+|--------|--------|
+| ![2D procedural map](image/2d.png) | ![3D procedural map](image/3d.png) |
 
 ## Install
 
@@ -148,4 +157,3 @@ renderMap(canvas, map, {
   },
 })
 ```
-# worldgenerator

@@ -7,38 +7,11 @@ interface BiomeEditorProps {
   onChange: (biomes: BiomeEntry[], colors: Record<string, string>) => void
 }
 
-/**
- * When the user sets biome[i].weight = newVal (0–100),
- * redistribute the remaining (100 - newVal) proportionally
- * among all other biomes (preserving their relative ratios).
- * Always keeps sum == 100.
- */
-function redistributeWeights(biomes: BiomeEntry[], changedIndex: number, newVal: number): BiomeEntry[] {
-  const clamped = Math.max(0, Math.min(100, Math.round(newVal)))
-  const remaining = 100 - clamped
-  const others = biomes.filter((_, i) => i !== changedIndex)
-  const othersTotal = others.reduce((s, b) => s + b.weight, 0)
-
-  return biomes.map((b, i) => {
-    if (i === changedIndex) return { ...b, weight: clamped }
-    if (othersTotal === 0) {
-      // all others were 0 — distribute evenly
-      return { ...b, weight: Math.round(remaining / others.length) }
-    }
-    return { ...b, weight: Math.round((b.weight / othersTotal) * remaining) }
-  })
-}
-
 export default function BiomeEditor({ biomes, colors, onChange }: BiomeEditorProps) {
   const [expandedRow, setExpandedRow] = useState<number | null>(null)
 
   function updateBiome(index: number, patch: Partial<BiomeEntry>) {
     const updated = biomes.map((b, i) => i === index ? { ...b, ...patch } : b)
-    onChange(updated, buildColors(updated, colors))
-  }
-
-  function updateWeight(index: number, newVal: number) {
-    const updated = redistributeWeights(biomes, index, newVal)
     onChange(updated, buildColors(updated, colors))
   }
 
@@ -62,38 +35,20 @@ export default function BiomeEditor({ biomes, colors, onChange }: BiomeEditorPro
     if (biomes.length <= 1) return
     const removed = biomes[index]
     const remaining = biomes.filter((_, i) => i !== index)
-    // redistribute the deleted biome's weight to the last remaining biome
-    const totalRemaining = remaining.reduce((s, b) => s + b.weight, 0)
-    const diff = 100 - totalRemaining
-    if (diff !== 0 && remaining.length > 0) {
-      remaining[remaining.length - 1].weight = Math.max(0, remaining[remaining.length - 1].weight + diff)
-    }
     const updatedColors = { ...colors }
     delete updatedColors[removed.name]
     onChange(remaining, updatedColors)
   }
 
   function addBiome() {
-    // give the new biome 10% and scale others down
     const newBiome: BiomeEntry = {
       name: 'new',
-      heightMin: 0.9,
-      heightMax: 1.0,
+      heightMin: 0.0,
+      heightMax: 0.1,
       color: '#ffffff',
-      weight: 10,
       objects: [],
     }
-    const scaled = biomes.map(b => ({
-      ...b,
-      weight: Math.round(b.weight * 0.9),
-    }))
-    // fix rounding so sum == 100
-    const sum = scaled.reduce((s, b) => s + b.weight, 0) + 10
-    if (sum !== 100 && scaled.length > 0) {
-      scaled[0].weight += 100 - sum
-    }
-    const updatedBiomes = [...scaled, newBiome]
-    onChange(updatedBiomes, { ...colors, new: '#ffffff' })
+    onChange([...biomes, newBiome], { ...colors, new: '#ffffff' })
   }
 
   return (
@@ -101,6 +56,8 @@ export default function BiomeEditor({ biomes, colors, onChange }: BiomeEditorPro
       {biomes.map((biome, i) => {
         const invalid = biome.heightMin >= biome.heightMax
         const isExpanded = expandedRow === i
+        const minPct = Math.round(biome.heightMin * 100)
+        const maxPct = Math.round(biome.heightMax * 100)
         return (
           <div key={i} className="biome-card">
             {/* Header: color + name + delete */}
@@ -132,53 +89,23 @@ export default function BiomeEditor({ biomes, colors, onChange }: BiomeEditorPro
               >✕</button>
             </div>
 
-            {/* Weight slider — always visible */}
-            <div className="biome-field-group">
-              <span className="biome-field-label">
-                Weight <span className="val">{biome.weight}%</span>
-              </span>
-              <div className="biome-prob-row">
+            {/* Height range sliders */}
+            <div className="biome-card-heights">
+              <div className="biome-field-group">
+                <span className="biome-field-label">Min height <span className="val">{biome.heightMin.toFixed(2)}</span></span>
                 <input
                   type="range"
                   className="biome-prob-slider"
-                  value={biome.weight}
-                  min={0} max={100} step={1}
-                  onChange={e => updateWeight(i, Number(e.target.value))}
-                />
-                <input
-                  type="number"
-                  className="biome-height-input biome-prob-number"
-                  value={biome.weight}
-                  min={0} max={100} step={1}
-                  onChange={e => updateWeight(i, Number(e.target.value))}
-                />
-              </div>
-              {/* Visual weight bar */}
-              <div className="biome-weight-bar-wrap">
-                <div
-                  className="biome-weight-bar"
-                  style={{ width: `${biome.weight}%`, background: biome.color }}
-                />
-              </div>
-            </div>
-
-            {/* Height range */}
-            <div className="biome-card-heights">
-              <div className="biome-field-group">
-                <span className="biome-field-label">Height min</span>
-                <input
-                  type="number"
-                  className="biome-height-input"
                   value={biome.heightMin}
                   min={0} max={1} step={0.01}
                   onChange={e => updateBiome(i, { heightMin: Number(e.target.value) })}
                 />
               </div>
               <div className="biome-field-group">
-                <span className="biome-field-label">Height max</span>
+                <span className="biome-field-label">Max height <span className="val">{biome.heightMax.toFixed(2)}</span></span>
                 <input
-                  type="number"
-                  className="biome-height-input"
+                  type="range"
+                  className="biome-prob-slider"
                   value={biome.heightMax}
                   min={0} max={1} step={0.01}
                   onChange={e => updateBiome(i, { heightMax: Number(e.target.value) })}
@@ -264,6 +191,15 @@ export default function BiomeEditor({ biomes, colors, onChange }: BiomeEditorPro
                 >+ Add Object</button>
               </div>
             )}
+
+            {/* Height range visualisation bar — always at the very bottom of the card */}
+            <div
+              className="biome-height-range-bar"
+              title={`${minPct}% – ${maxPct}%`}
+              style={{
+                background: `linear-gradient(to right, #1a1a3e ${minPct}%, ${biome.color} ${minPct}%, ${biome.color} ${maxPct}%, #1a1a3e ${maxPct}%)`,
+              }}
+            />
           </div>
         )
       })}
